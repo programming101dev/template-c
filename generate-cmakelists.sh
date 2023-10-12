@@ -63,7 +63,7 @@ generate_cmake_content() {
   done < "$input_file"
 
   # Extract the compiler name without the path
-  echo "message(\"C++ Compiler: \${CMAKE_C_COMPILER}\")" >> "$output_file"
+  echo "message(\"C Compiler: \${CMAKE_C_COMPILER}\")" >> "$output_file"
   echo "get_filename_component(COMPILER_NAME \"\${CMAKE_C_COMPILER}\" NAME_WE)" >> "$output_file"
   echo "message(\"COMPILER_NAME: \${COMPILER_NAME}\")" >> "$output_file"
   echo "" >> "$output_file"
@@ -151,6 +151,13 @@ generate_cmake_content() {
   echo "        COMMAND \${CMAKE_C_COMPILER} --analyzer-output text --analyze -Xclang -analyzer-checker=core --analyze -Xclang -analyzer-checker=deadcode -Xclang -analyzer-checker=security -Xclang -analyzer-disable-checker=security.insecureAPI.DeprecatedOrUnsafeBufferHandling -Xclang -analyzer-checker=unix -Xclang -analyzer-checker=unix \${CMAKE_C_FLAGS} \${STANDARD_FLAGS} \${SOURCES} \${HEADERS}" >> "$output_file"
   echo "        WORKING_DIRECTORY \${CMAKE_SOURCE_DIR}" >> "$output_file"
   echo "        COMMENT \"Running clang --analyze\"" >> "$output_file"
+  echo "    )" >> "$output_file"
+  echo "" >> "$output_file"
+  echo "    # Add a custom command to delete .gch files after the analysis" >> "$output_file"
+  echo "    add_custom_command(" >> "$output_file"
+  echo "        TARGET main POST_BUILD" >> "$output_file"
+  echo "        COMMAND \${CMAKE_COMMAND} -E remove \${CMAKE_SOURCE_DIR}/*.gch" >> "$output_file"
+  echo "        COMMENT \"Removing .gch files\"" >> "$output_file"
   echo "    )" >> "$output_file"
   echo "endif ()" >> "$output_file"
   echo "" >> "$output_file"
