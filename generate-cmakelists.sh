@@ -13,6 +13,7 @@ generate_cmake_content() {
   shift
   local sources=""
   local headers=""
+  local libraries=""
 
   for file in "$@"; do
     if [[ $file == *".c" ]]; then
@@ -21,6 +22,8 @@ generate_cmake_content() {
     elif [[ $file == *".h" ]]; then
       headers="${headers}    \${CMAKE_SOURCE_DIR}/$file\n"
       echo "list(APPEND HEADERS \${CMAKE_SOURCE_DIR}/$file)" >> "$output_file"
+    else
+      libraries="${libraries} $file"
     fi
   done
 
@@ -32,6 +35,12 @@ generate_cmake_content() {
   echo -e "$headers)" >> "$output_file"
   echo "" >> "$output_file"
   echo "add_executable($entity \${${entity}_SOURCES})" >> "$output_file"
+  echo "" >> "$output_file"
+
+  # Add target_link_libraries for the entity
+  for library in $libraries; do
+    echo "target_link_libraries($entity PRIVATE $library)" >> "$output_file"
+  done
   echo "" >> "$output_file"
 }
 
