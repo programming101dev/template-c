@@ -1,4 +1,4 @@
-#include "display.h"
+#include "../include/display.h"
 #include <stdio.h>
 
 void display(const char *msg)

@@ -35,7 +35,23 @@ generate_cmake_content() {
   echo -e "$headers)" >> "$output_file"
   echo "" >> "$output_file"
   echo "add_executable($entity \${${entity}_SOURCES})" >> "$output_file"
+  echo "target_include_directories($entity PUBLIC \${CMAKE_SOURCE_DIR}/include)" >> "$output_file"
+  echo "target_include_directories($entity PRIVATE /usr/local/include)" >> "$output_file"
   echo "" >> "$output_file"
+
+ echo "# Check if the system uses 64-bit libraries" >> "$output_file"
+ echo "get_property(LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)" >> "$output_file"
+ echo "" >> "$output_file" >> "$output_file"
+
+ echo "#Set the library suffix based on whether it's 64-bit or not" >> "$output_file"
+ echo "if (\"\${LIB64}\" STREQUAL \"TRUE\")" >> "$output_file"
+ echo "   set(LIBSUFFIX 64)" >> "$output_file"
+ echo "else()" >> "$output_file"
+ echo "    set(LIBSUFFIX \"\")" >> "$output_file"
+ echo "endif()" >> "$output_file"
+ echo "" >> "$output_file"
+ echo "target_link_directories($entity PRIVATE /usr/local/lib\${LIBSUFFIX})" >> "$output_file"
+ echo "" >> "$output_file"
 
   # Add target_link_libraries for the entity
   for library in $libraries; do
@@ -166,7 +182,7 @@ generate_cmake_content() {
   # Add the cppcheck custom command
   echo "add_custom_command(" >> "$output_file"
   echo "    TARGET $first_target POST_BUILD" >> "$output_file"
-  echo "    COMMAND \${CLANG_TIDY} \${SOURCES} \${HEADERS} -quiet --warnings-as-errors='*' -checks=*,-llvmlibc-restrict-system-libc-headers,-altera-struct-pack-align,-readability-identifier-length,-altera-unroll-loops,-cppcoreguidelines-init-variables,-cert-err33-c,-modernize-macro-to-enum,-bugprone-easily-swappable-parameters,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-altera-id-dependent-backward-branch,-concurrency-mt-unsafe,-misc-unused-parameters,-hicpp-signed-bitwise,-google-readability-todo,-cert-msc30-c,-cert-msc50-cpp,-readability-function-cognitive-complexity,-clang-analyzer-security.insecureAPI.strcpy,-cert-env33-c,-android-cloexec-accept,-clang-analyzer-security.insecureAPI.rand,-misc-include-cleaner,-llvm-header-guard -- \${STANDARD_FLAGS} -I/usr/local/include" >> "$output_file"
+  echo "    COMMAND \${CLANG_TIDY} \${SOURCES} \${HEADERS} -quiet --warnings-as-errors='*' -checks=*,-llvmlibc-restrict-system-libc-headers,-altera-struct-pack-align,-readability-identifier-length,-altera-unroll-loops,-cppcoreguidelines-init-variables,-cert-err33-c,-modernize-macro-to-enum,-bugprone-easily-swappable-parameters,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-altera-id-dependent-backward-branch,-concurrency-mt-unsafe,-misc-unused-parameters,-hicpp-signed-bitwise,-google-readability-todo,-cert-msc30-c,-cert-msc50-cpp,-readability-function-cognitive-complexity,-clang-analyzer-security.insecureAPI.strcpy,-cert-env33-c,-android-cloexec-accept,-clang-analyzer-security.insecureAPI.rand,-misc-include-cleaner,-llvm-header-guard -- \${STANDARD_FLAGS} -I\${CMAKE_SOURCE_DIR}/include -I/usr/local/include" >> "$output_file"
   echo "    WORKING_DIRECTORY \${CMAKE_SOURCE_DIR}" >> "$output_file"
   echo "    COMMENT \"Running clang-tidy\"" >> "$output_file"
   echo ")" >> "$output_file"
@@ -177,7 +193,7 @@ generate_cmake_content() {
   echo "    # Add a custom target for clang --analyze" >> "$output_file"
   echo "    add_custom_command(" >> "$output_file"
   echo "        TARGET $first_target POST_BUILD" >> "$output_file"
-  echo "        COMMAND \${CMAKE_C_COMPILER} --analyzer-output text --analyze -Xclang -analyzer-checker=core --analyze -Xclang -analyzer-checker=deadcode -Xclang -analyzer-checker=security -Xclang -analyzer-disable-checker=security.insecureAPI.DeprecatedOrUnsafeBufferHandling -Xclang -analyzer-checker=unix -Xclang -analyzer-checker=unix \${CMAKE_C_FLAGS} \${STANDARD_FLAGS} \${SOURCES} \${HEADERS}" >> "$output_file"
+  echo "        COMMAND \${CMAKE_C_COMPILER} --analyzer-output text --analyze -Xclang -analyzer-checker=core --analyze -Xclang -analyzer-checker=deadcode -Xclang -analyzer-checker=security -Xclang -analyzer-disable-checker=security.insecureAPI.DeprecatedOrUnsafeBufferHandling -Xclang -analyzer-checker=unix -Xclang -analyzer-checker=unix \${CMAKE_C_FLAGS} \${STANDARD_FLAGS} -I\${CMAKE_SOURCE_DIR}/include -I/usr/local/include \${SOURCES} \${HEADERS}" >> "$output_file"
   echo "        WORKING_DIRECTORY \${CMAKE_SOURCE_DIR}" >> "$output_file"
   echo "        COMMENT \"Running clang --analyze\"" >> "$output_file"
   echo "    )" >> "$output_file"
@@ -194,7 +210,7 @@ generate_cmake_content() {
   # Add a custom target for cppcheck
   echo "add_custom_command(" >> "$output_file"
   echo "    TARGET $first_target POST_BUILD" >> "$output_file"
-  echo "    COMMAND \${CPPCHECK} --error-exitcode=1 --force --quiet --inline-suppr --library=posix --enable=all --suppress=missingIncludeSystem --suppress=unusedFunction --suppress=unmatchedSuppression \${SOURCES} \${HEADERS}" >> "$output_file"
+  echo "    COMMAND \${CPPCHECK} --error-exitcode=1 --force --quiet --inline-suppr --library=posix --enable=all --suppress=missingIncludeSystem --suppress=unusedFunction --suppress=unmatchedSuppression --suppress=checkersReport -I\${CMAKE_SOURCE_DIR}/include -I/usr/local/include \${SOURCES} \${HEADERS}" >> "$output_file"
   echo "    WORKING_DIRECTORY \${CMAKE_SOURCE_DIR}" >> "$output_file"
   echo "    COMMENT \"Running cppcheck\"" >> "$output_file"
   echo ")" >> "$output_file"
