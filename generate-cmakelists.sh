@@ -41,7 +41,7 @@ generate_cmake_content() {
 
  echo "# Check if the system uses 64-bit libraries" >> "$output_file"
  echo "get_property(LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)" >> "$output_file"
- echo "" >> "$output_file" >> "$output_file"
+ echo "" >> "$output_file"
 
  echo "#Set the library suffix based on whether it's 64-bit or not" >> "$output_file"
  echo "if (\"\${LIB64}\" STREQUAL \"TRUE\")" >> "$output_file"
@@ -103,22 +103,22 @@ generate_cmake_content() {
   echo "" >> "$output_file"
 
   # Import warning_flags.txt
-  echo "file(STRINGS \"\${CMAKE_SOURCE_DIR}/flags/\${COMPILER_NAME}/warning_flags.txt\" WARNING_FLAGS_STRING)" >> "$output_file"
+  echo "file(STRINGS \"\${CMAKE_SOURCE_DIR}/.flags/\${COMPILER_NAME}/warning_flags.txt\" WARNING_FLAGS_STRING)" >> "$output_file"
   echo "split_string_into_list(\"\${WARNING_FLAGS_STRING}\" WARNING_FLAGS_LIST)" >> "$output_file"
   echo "" >> "$output_file"
 
   # Import analyzer_flags.txt
-  echo "file(STRINGS \"\${CMAKE_SOURCE_DIR}/flags/\${COMPILER_NAME}/analyzer_flags.txt\" ANALYZER_FLAGS_STRING)" >> "$output_file"
+  echo "file(STRINGS \"\${CMAKE_SOURCE_DIR}/.flags/\${COMPILER_NAME}/analyzer_flags.txt\" ANALYZER_FLAGS_STRING)" >> "$output_file"
   echo "split_string_into_list(\"\${ANALYZER_FLAGS_STRING}\" ANALYZER_FLAGS_LIST)" >> "$output_file"
   echo "" >> "$output_file"
 
   # Import debug_flags.txt
-  echo "file(STRINGS \"\${CMAKE_SOURCE_DIR}/flags/\${COMPILER_NAME}/debug_flags.txt\" DEBUG_FLAGS_STRING)" >> "$output_file"
+  echo "file(STRINGS \"\${CMAKE_SOURCE_DIR}/.flags/\${COMPILER_NAME}/debug_flags.txt\" DEBUG_FLAGS_STRING)" >> "$output_file"
   echo "split_string_into_list(\"\${DEBUG_FLAGS_STRING}\" DEBUG_FLAGS_LIST)" >> "$output_file"
   echo "" >> "$output_file"
 
   # Import sanitizer_flags.txt
-  echo "file(STRINGS \"\${CMAKE_SOURCE_DIR}/flags/\${COMPILER_NAME}/sanitizer_flags.txt\" SANITIZER_FLAGS_STRING)" >> "$output_file"
+  echo "file(STRINGS \"\${CMAKE_SOURCE_DIR}/.flags/\${COMPILER_NAME}/sanitizer_flags.txt\" SANITIZER_FLAGS_STRING)" >> "$output_file"
   echo "split_string_into_list(\"\${SANITIZER_FLAGS_STRING}\" SANITIZER_FLAGS_LIST)" >> "$output_file"
   echo "" >> "$output_file"
 
