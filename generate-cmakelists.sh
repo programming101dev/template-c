@@ -41,7 +41,7 @@ generate_cmake_content() {
 
  echo "# Check if the system uses 64-bit libraries" >> "$output_file"
  echo "get_property(LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)" >> "$output_file"
- echo "" >> "$output_file"
+ echo "" >> "$output_file" >> "$output_file"
 
  echo "#Set the library suffix based on whether it's 64-bit or not" >> "$output_file"
  echo "if (\"\${LIB64}\" STREQUAL \"TRUE\")" >> "$output_file"
@@ -201,7 +201,7 @@ generate_cmake_content() {
   echo "    # Add a custom command to delete .gch files after the analysis" >> "$output_file"
   echo "    add_custom_command(" >> "$output_file"
   echo "        TARGET $first_target POST_BUILD" >> "$output_file"
-  echo "        COMMAND \${CMAKE_COMMAND} -E remove \${CMAKE_SOURCE_DIR}/*.gch" >> "$output_file"
+  echo "        COMMAND \${CMAKE_COMMAND} -E remove \${CMAKE_SOURCE_DIR}/include/*.gch" >> "$output_file"
   echo "        COMMENT \"Removing .gch files\"" >> "$output_file"
   echo "    )" >> "$output_file"
   echo "endif ()" >> "$output_file"
