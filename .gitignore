@@ -476,3 +476,5 @@ supported_cxx_compilers.txt
 .flags
 
 CMakeLists.txt
+
+build/
