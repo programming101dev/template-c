@@ -343,7 +343,7 @@ generate_cmake_content()
   # Add the cppcheck custom command
   echo "add_custom_command(" >> "$output_file"
   echo "    TARGET $first_target POST_BUILD" >> "$output_file"
-  echo "    COMMAND \${CLANG_TIDY} \${SOURCES} \${HEADERS} -quiet --warnings-as-errors='*' -checks=*,-llvmlibc-restrict-system-libc-headers,-altera-struct-pack-align,-readability-identifier-length,-altera-unroll-loops,-cppcoreguidelines-init-variables,-cert-err33-c,-modernize-macro-to-enum,-bugprone-easily-swappable-parameters,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-altera-id-dependent-backward-branch,-concurrency-mt-unsafe,-misc-unused-parameters,-hicpp-signed-bitwise,-google-readability-todo,-cert-msc30-c,-cert-msc50-cpp,-readability-function-cognitive-complexity,-clang-analyzer-security.insecureAPI.strcpy,-cert-env33-c,-android-cloexec-accept,-clang-analyzer-security.insecureAPI.rand,-misc-include-cleaner,-llvm-header-guard -- \${STANDARD_FLAGS} -I\${CMAKE_SOURCE_DIR}/include -I/usr/local/include" >> "$output_file"
+  echo "    COMMAND \${CLANG_TIDY} \${SOURCES} \${HEADERS} -quiet --warnings-as-errors='*' -checks=*,-llvmlibc-restrict-system-libc-headers,-altera-struct-pack-align,-readability-identifier-length,-altera-unroll-loops,-cppcoreguidelines-init-variables,-cert-err33-c,-modernize-macro-to-enum,-bugprone-easily-swappable-parameters,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-altera-id-dependent-backward-branch,-concurrency-mt-unsafe,-misc-unused-parameters,-hicpp-signed-bitwise,-google-readability-todo,-cert-msc30-c,-cert-msc50-cpp,-readability-function-cognitive-complexity,-clang-analyzer-security.insecureAPI.strcpy,-cert-env33-c,-android-cloexec-accept,-clang-analyzer-security.insecureAPI.rand,-misc-include-cleaner,-llvm-header-guard,-cppcoreguidelines-macro-to-enum -- \${STANDARD_FLAGS} -I\${CMAKE_SOURCE_DIR}/include -I/usr/local/include" >> "$output_file"
   echo "    WORKING_DIRECTORY \${CMAKE_SOURCE_DIR}" >> "$output_file"
   echo "    COMMENT \"Running clang-tidy\"" >> "$output_file"
   echo ")" >> "$output_file"
@@ -371,7 +371,7 @@ generate_cmake_content()
   # Add a custom target for cppcheck
   echo "add_custom_command(" >> "$output_file"
   echo "    TARGET $first_target POST_BUILD" >> "$output_file"
-  echo "    COMMAND \${CPPCHECK} --error-exitcode=1 --force --quiet --inline-suppr --library=posix --enable=all --suppress=missingIncludeSystem --suppress=unusedFunction --suppress=unmatchedSuppression --suppress=checkersReport -I\${CMAKE_SOURCE_DIR}/include -I/usr/local/include \${SOURCES} \${HEADERS}" >> "$output_file"
+  echo "    COMMAND \${CPPCHECK} --error-exitcode=1 --force --quiet --inline-suppr --check-level=exhaustive --library=posix --enable=all --suppress=missingIncludeSystem --suppress=unusedFunction --suppress=unmatchedSuppression --suppress=checkersReport -I\${CMAKE_SOURCE_DIR}/include -I/usr/local/include \${SOURCES} \${HEADERS}" >> "$output_file"
   echo "    WORKING_DIRECTORY \${CMAKE_SOURCE_DIR}" >> "$output_file"
   echo "    COMMENT \"Running cppcheck\"" >> "$output_file"
   echo ")" >> "$output_file"
