@@ -53,6 +53,11 @@ if [ -z "$c_compiler" ]; then
   usage
 fi
 
+if [ ! -d "./.flags" ]; then
+    echo "Error: .flags directory does not exist. Please run generate-flags.sh to create it."
+    exit 1
+fi
+
 ./check-env.sh -c "$c_compiler" -f "$clang_format_name" -t "$clang_tidy_name" -k "$cppcheck_name"
 
 if [ ! -f "supported_c_compilers.txt" ] || ! grep -Fxq "$c_compiler" supported_c_compilers.txt; then
