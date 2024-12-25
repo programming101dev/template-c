@@ -396,7 +396,7 @@ generate_cmake_content() {
   echo "      COMMAND find ${CMAKE_BINARY_DIR} -name "*.gcda" -delete" >> "$output_file"
   echo "      COMMENT "Cleaning up old .gcda files"" >> "$output_file"
   echo ")" >> "$output_file"
-  echo ")"add_dependencies($first_target clean_gcda) >> "$output_file"
+  echo "add_dependencies($first_target clean_gcda)" >> "$output_file"
 }
 
 exit $?
