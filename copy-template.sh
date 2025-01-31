@@ -17,8 +17,8 @@ fi
 
 dest_dir=$1
 
-# Construct the source directory path
-source_dir="."
+# Resolve absolute path of source directory
+source_dir="$(realpath .)"
 
 # Check if the destination directory exists; if not, create it
 if [ ! -d "$dest_dir" ]; then
@@ -26,28 +26,27 @@ if [ ! -d "$dest_dir" ]; then
     echo "Created destination directory: $dest_dir"
 fi
 
-# Copy the sanitizers file
-sanitizers_file="sanitizers.txt"
+# List of files to link instead of copy
+files_to_link=("sanitizers.txt" ".flags" "supported_c_compilers.txt")
 
-if [ -e "$source_dir/$sanitizers_file" ]; then
-    cp -a "$source_dir/$sanitizers_file" "$dest_dir"
-    echo "Copied $sanitizers_file to $dest_dir"
-else
-    echo "$sanitizers_file not found in the template directory. Skipping."
-fi
+for file in "${files_to_link[@]}"; do
+    source_file="$source_dir/$file"
+    dest_file="$dest_dir/$file"
 
-# Copy the supported compilers file
-compilers_file="supported_c_compilers.txt"
-
-if [ -e "$source_dir/$compilers_file" ]; then
-    cp -a "$source_dir/$compilers_file" "$dest_dir"
-    echo "Copied $compilers_file to $dest_dir"
-else
-    echo "$compilers_file not found in the template directory. Skipping."
-fi
+    if [ -e "$source_file" ]; then
+        if [ ! -L "$dest_file" ]; then
+            ln -s "$source_file" "$dest_file"
+            echo "Linked $file to $dest_dir"
+        else
+            echo "$file already linked in $dest_dir. Skipping."
+        fi
+    else
+        echo "$file not found in the template directory. Skipping."
+    fi
+done
 
 # List of files and directories to copy
-files_to_copy=(".flags" ".clang-format" ".gitignore" "build.sh" "build-all.sh" "change-compiler.sh" "check-compilers.sh" "check-env.sh" "move.sh" "files.txt" "generate-cmakelists.sh" "generate-flags.sh" "link-flags.sh" "README.md" "src" "include")
+files_to_copy=(".clang-format" ".gitignore" "build.sh" "build-all.sh" "change-compiler.sh" "check-compilers.sh" "check-env.sh" "create-links.sh" "move.sh" "files.txt" "generate-cmakelists.sh" "generate-flags.sh" "README.md" "src" "include")
 
 # Copy files and directories to the destination directory
 for item in "${files_to_copy[@]}"; do
