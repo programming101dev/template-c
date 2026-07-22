@@ -98,3 +98,25 @@ The files.txt file contains:
 <executable> <source files> <header files> <libraries>
 
 When you need to add/removes files to/from the project you must rerun the 4 steps above. 
+
+
+## Commands (cheat-sheet)
+
+Configure a compiler, then build:
+
+    ./change-compiler.sh -c gcc-16       # or just: ./change-compiler.sh gcc-16
+    ./build.sh                           # add -q to hide the per-file command dump
+    ./change-compiler.sh --help          # lists the compilers detected on this machine
+
+Opt-in instrumentation (chosen at configure time):
+
+    ./change-compiler.sh -c clang -s address,undefined   # sanitizers
+    ./change-compiler.sh -c gcc-16 --coverage            # code coverage (gcov)
+
+Housekeeping:
+
+    ./clean.sh          # remove build-/coverage-/profile- output (-n previews)
+    <script> --help     # every script supports --help
+
+Note: coverage/profiling reports (report.sh / coverage-report.sh) live in the
+program templates — a library is exercised through a test/driver program.
