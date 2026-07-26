@@ -5,6 +5,9 @@
 #ifndef PROGRAMMING101_DISPLAY_H
 #define PROGRAMMING101_DISPLAY_H
 
-void display(const char *msg);
+#include <p101_env/env.h>
+#include <p101_error/error.h>
+
+void display(const struct p101_env *env, struct p101_error *err, const char *msg);
 
 #endif    // PROGRAMMING101_DISPLAY_H

@@ -1,7 +1,7 @@
 #include "../include/display.h"
-#include <stdio.h>
+#include <p101_c/p101_stdio.h>
 
-void display(const char *msg)
+void display(const struct p101_env *env, struct p101_error *err, const char *msg)
 {
-    printf("%s\n", msg);
+    p101_printf(env, err, "%s\n", msg);
 }
