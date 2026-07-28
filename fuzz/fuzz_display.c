@@ -12,7 +12,6 @@
  * fuzz/CMakeLists.txt) so it is instrumented and coverage-guided, not black-box.
  */
 #include "display.h"
-#include <p101_c/p101_setjmp.h>
 #include <p101_c/p101_stdio.h>
 #include <p101_c/p101_stdlib.h>
 #include <p101_c/p101_string.h>
