@@ -1,8 +1,7 @@
 #include "unity.h"
 #include "../include/display.h"
 #include <p101_c/p101_stdio.h>
-#include <p101_posix/p101_stdio.h>
-#include <p101_posix/p101_unistd.h>
+#include <p101_io/io.h>
 #include <stdio.h>
 #include <string.h>
 
