@@ -42,6 +42,10 @@ function(p101_add_test name)
     target_include_directories(${name} PRIVATE ${P101_PUBLIC_INCLUDE_DIRS_LIST})
     target_link_directories(${name} PRIVATE ${P101_PUBLIC_LINK_DIRS_LIST})
     target_link_libraries(${name} PRIVATE unity p101_error p101_env p101_c p101_io)
+    # A p101 library can itself depend on another p101 shared library. Keep the
+    # complete admitted search path in the test executable so those transitive
+    # @rpath dependencies remain resolvable in a copied standalone project.
+    set_target_properties(${name} PROPERTIES BUILD_RPATH "${P101_PUBLIC_LINK_DIRS_LIST}")
     target_compile_options(${name} PRIVATE ${_P101_COV})
     target_link_options(${name} PRIVATE ${_P101_COV})
     add_test(NAME ${name} COMMAND ${name})
