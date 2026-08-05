@@ -1,5 +1,5 @@
-#include "unity.h"
 #include "../include/display.h"
+#include "unity.h"
 #include <p101_c/p101_stdio.h>
 #include <p101_io/io.h>
 #include <stdio.h>

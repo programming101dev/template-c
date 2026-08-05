@@ -23,6 +23,25 @@ if (APPLE)
     list(APPEND P101_PUBLIC_LINK_DIRS_LIST /opt/homebrew/lib /opt/local/lib)
 endif ()
 
+# Apple Clang otherwise records its dynamic ASan runtime after the p101 shared
+# libraries, which makes ASan abort before main with "loaded too late".
+set(P101_ASAN_RUNTIME "")
+if (APPLE AND CMAKE_C_COMPILER_ID MATCHES "Clang" AND
+    CMAKE_C_FLAGS MATCHES "(^|[ ;])-fsanitize=address($|[ ;])")
+    execute_process(
+            COMMAND "${CMAKE_C_COMPILER}" --print-resource-dir
+            OUTPUT_VARIABLE P101_CLANG_RESOURCE_DIR
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET)
+    set(P101_ASAN_RUNTIME
+        "${P101_CLANG_RESOURCE_DIR}/lib/darwin/libclang_rt.asan_osx_dynamic.dylib")
+    if (NOT EXISTS "${P101_ASAN_RUNTIME}")
+        message(FATAL_ERROR
+                "AddressSanitizer runtime not found for ${CMAKE_C_COMPILER}: "
+                "${P101_ASAN_RUNTIME}")
+    endif ()
+endif ()
+
 # Optional coverage of the code under test (test.sh --coverage passes this).
 option(P101_TEST_COVERAGE "Instrument the code under test for coverage" OFF)
 set(_P101_COV "")
@@ -41,6 +60,9 @@ function(p101_add_test name)
     target_include_directories(${name} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../include")
     target_include_directories(${name} PRIVATE ${P101_PUBLIC_INCLUDE_DIRS_LIST})
     target_link_directories(${name} PRIVATE ${P101_PUBLIC_LINK_DIRS_LIST})
+    if (P101_ASAN_RUNTIME)
+        target_link_libraries(${name} PRIVATE "${P101_ASAN_RUNTIME}")
+    endif ()
     target_link_libraries(${name} PRIVATE unity p101_error p101_env p101_c p101_io)
     # A p101 library can itself depend on another p101 shared library. Keep the
     # complete admitted search path in the test executable so those transitive
