@@ -139,16 +139,35 @@ if p101_workspace_root="$(p101_find_workspace_root)"; then
   done
   for lib in "$p101_workspace_root"/libraries/*; do
     [ -d "$lib" ] || continue
-    # Prefer libraries built by the same compiler. On macOS, mixing an
-    # Apple-Clang ASan dylib with a Homebrew-Clang fuzzer loads two incompatible
-    # sanitizer runtimes.
-    p101_dependency_dir="$lib/$p101_preferred_build_dir"
+    # The workspace gives every repository its own content-addressed build
+    # suffix.  Follow the finalized marker instead of guessing one common
+    # directory name; the latter silently fell back to installed libraries and
+    # produced fuzz executables whose dependent dylibs could not be loaded.
+    p101_dependency_dir=""
+    for p101_marker in .last-build-dir .last-runtime-build-dir; do
+      [ -f "$lib/$p101_marker" ] || continue
+      IFS= read -r p101_marked_build < "$lib/$p101_marker"
+      [ -n "$p101_marked_build" ] || continue
+      case "$p101_marked_build" in
+        /*) p101_candidate_dir="$p101_marked_build" ;;
+        *) p101_candidate_dir="$lib/$p101_marked_build" ;;
+      esac
+      if [ -d "$p101_candidate_dir" ]; then
+        p101_dependency_dir="$p101_candidate_dir"
+        break
+      fi
+    done
+    if [ -z "$p101_dependency_dir" ]; then
+      p101_dependency_dir="$lib/$p101_preferred_build_dir"
+    fi
     [ -d "$p101_dependency_dir" ] && p101_local_link_dirs+=("$p101_dependency_dir")
   done
   p101_local_include_dirs_joined="$(p101_join_paths ${p101_local_include_dirs[@]+"${p101_local_include_dirs[@]}"})"
   p101_local_link_dirs_joined="$(p101_join_paths ${p101_local_link_dirs[@]+"${p101_local_link_dirs[@]}"})"
+  p101_local_build_rpath="$(IFS=';'; printf '%s' "${p101_local_link_dirs[*]}")"
   [ -n "$p101_local_include_dirs_joined" ] && p101_path_args+=("-DP101_PUBLIC_INCLUDE_DIRS=$p101_local_include_dirs_joined")
   [ -n "$p101_local_link_dirs_joined" ] && p101_path_args+=("-DP101_PUBLIC_LINK_DIRS=$p101_local_link_dirs_joined")
+  [ -n "$p101_local_build_rpath" ] && p101_path_args+=("-DCMAKE_BUILD_RPATH=$p101_local_build_rpath")
 fi
 
 # A prior fuzz configure may have cached a sibling library from a different

@@ -293,6 +293,7 @@ p101_preferred_build_dir="build-$ccbase"
 p101_exact_build_key="$(sed -n 's/^P101_BUILD_KEY:[^=]*=//p' "$main_bd/CMakeCache.txt" | head -1)"
 p101_current_repo="$(pwd -P)"
 p101_path_args=()
+p101_path_args+=("-DP101_SOURCE_BUILD_DIR=$p101_current_build")
 p101_public_include_dirs="$(sed -n 's/^P101_PUBLIC_INCLUDE_DIRS:[^=]*=//p' "$main_bd/CMakeCache.txt" | head -1)"
 p101_public_link_dirs="$(sed -n 's/^P101_PUBLIC_LINK_DIRS:[^=]*=//p' "$main_bd/CMakeCache.txt" | head -1)"
 p101_join_paths() {
