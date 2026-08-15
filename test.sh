@@ -4,14 +4,16 @@
 # test code are not subjected to the project's strict analysis build. Uses the
 # same compiler the main build is using (from .last-build-dir). C and C++.
 set -euo pipefail
-CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
+runner_root="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+repository_root="${P101_REPOSITORY_ROOT:-$runner_root}"
+CDPATH='' cd -- "$repository_root"
 
 usage() {
   cat <<'USAGE'
-Usage: ./test.sh [--coverage] [-- <ctest args>]
+Usage: test-repo [--coverage] [-- <ctest args>]
   Configures/builds test/ with the compiler from the last main build
-  (./change-compiler.sh), then runs the Unity tests through ctest.
-  --coverage      instrument the code under test for ./coverage-report.sh.
+  CMake build, then runs the repository tests through ctest.
+  --coverage      instrument the code under test for a coverage report.
   -- <args>       pass the rest through to ctest (e.g. -- -R display -V).
 USAGE
 }
@@ -106,7 +108,7 @@ elif [ -f .last-build-dir ]; then
 elif [ -f .last-runtime-build-dir ]; then
   main_bd="$(cat .last-runtime-build-dir)"
 fi
-[ -f "$main_bd/CMakeCache.txt" ] || { echo "No configured main build ('$main_bd'). Run ./change-compiler.sh first." >&2; exit 1; }
+[ -f "$main_bd/CMakeCache.txt" ] || { echo "No configured main build ('$main_bd'). Configure it with CMake first." >&2; exit 1; }
 
 # project language decides which compiler the test tree needs
 if [ "$lang" = "CXX" ] || [ "$lang" = "CPP" ]; then
@@ -351,11 +353,3 @@ if [ "$coverage" -eq 1 ]; then
 fi
 echo ">> building tests"; cmake --build "$test_bd"
 echo ">> ctest"; ( cd "$test_bd" && ctest --output-on-failure ${ctest_args[@]+"${ctest_args[@]}"} )
-
-# Consolidated repositories may own additional component test trees. Keep the
-# shared build-selection and dependency-lane mechanism here; the optional hook
-# contains only the repository-specific list and invocation policy.
-if [ -f test-components.sh ]; then
-  # shellcheck source=/dev/null
-  source ./test-components.sh
-fi

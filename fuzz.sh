@@ -9,11 +9,13 @@
 # so it drops straight into a hook or CI step. Language is read from
 # config.cmake (PROJECT_LANGUAGE), the same way test.sh does it.
 set -euo pipefail
-CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
+runner_root="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+repository_root="${P101_REPOSITORY_ROOT:-$runner_root}"
+CDPATH='' cd -- "$repository_root"
 
 usage() {
   cat <<'USAGE'
-Usage: ./fuzz.sh [-t <seconds>] [-- <extra libFuzzer args>]
+Usage: fuzz-repo [-t <seconds>] [-- <extra libFuzzer args>]
   Builds fuzz/ with a fuzzer-capable clang/clang++ (+ASan/UBSan) and runs it
   against fuzz/corpus for a bounded time, then prints PASS or FAIL.
   -t <seconds>   wall-clock budget (default 30). 0 = run until stopped.
