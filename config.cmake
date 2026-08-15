@@ -42,3 +42,10 @@ set(main_LINK_LIBRARIES
         p101_env
         p101_c
 )
+
+# The production example uses only lib_c. Its stdout-capture unit test also
+# exercises the lib_io wrappers, so declare that test-only dependency without
+# adding it to the installed program's link contract.
+set(P101_TEST_LINK_LIBRARIES
+        p101_io
+)
